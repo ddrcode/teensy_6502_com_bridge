@@ -6,11 +6,11 @@ and a COM port, implemented for [Teensy 4.1 development board](https://www.pjrc.
 The main purpose for this project is to provide cycle-by-cycle debugging capabilities of W65C02, but it can serve
 other purpose too, i.e.:
 
-- comparative debugging for emulators
+- __Comparative debugging for emulators__:
     You can run your 6502-family emulator in parallel with an actual CPU to compare the results
     in order to measure the accuracy of an emulator.
-- emulated 8-bit computers with a physical processor
-    You can implemented an emulator of a 8-bit, 6502-based computer (i.e. C64), that will work
+- __Emulated 8-bit computers with a physical processor__:
+    You can implemented an emulator of an 8-bit, 6502-based computer (i.e. C64), that will work
     (via this bridge) with a real CPU, while other compnents of the system (like RAM, ROM,
     video chip) remain emulated.
 
@@ -55,7 +55,7 @@ In the minimalistic configuration the following pins must be connected with the 
 - `GND` - ground, should be connected with Teensy's ground pin
 - `VDD` - power; should be connected with Teensy's 3.3V pin
 
-In such configuration `RES`, `IRQ', `NMI` and `BE` pins must be also connected to 3.3V
+In such configuration `RES`, `IRQ`, `NMI` and `BE` pins must be also connected to 3.3V
 and `RDY` pin should be connected with power via resistor.
 
 ### Default configuration
