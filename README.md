@@ -1,9 +1,9 @@
 # W65C02-COM bridge for Teensy 4.1
 
 This project is a simple bridge between [W65C02 CPU](https://westerndesigncenter.com/wdc/documentation/w65c02s.pdf)
-and a COM port, implemented for [Teensy 4.1 development board](https://www.pjrc.com/store/teensy41.html).
+and a COM port, implemented for [Teensy 4.1](https://www.pjrc.com/store/teensy41.html) development board.
 
-The main purpose for this project is to provide cycle-by-cycle debugging capabilities of W65C02, but it can serve
+The main purpose of this project is to provide cycle-by-cycle debugging capabilities for W65C02, but it can serve
 other purpose too, i.e.:
 
 - __Comparative debugging for emulators__:
@@ -14,7 +14,7 @@ other purpose too, i.e.:
   (via this bridge) with a real CPU, while other components of the system (like RAM, ROM,
   video chip) remain emulated.
 
-## Connection
+## Wiring
 
 The CPU is a 40-pin chip, with 37 data pins (2 pins are for
 power/ground and pin 35 is unused). As Teensy board is equipped with 38 digital input/output pins,
@@ -51,7 +51,7 @@ Below there is a pinout diagram of the W65C02 CPU
 
 ### Minimal configuration
 
-In the minimalistic configuration the following pins must be connected with the board:
+In the minimalistic configuration the following CPU pins must be connected to the board:
 
 - `A0-A15` - address bus (input)
 - `D0-D7` - data bus (input or output; input by default)
@@ -93,9 +93,10 @@ In order to adjust the pin mapping, modify `PINS_MAP` macro definition in the
 | 32         | 20      | A11          |      | Ground        | 21      | Ground     |
 
 ### Example
+
 ![Example wiring](./assets/board.jpg)
-The photo demonstrate the minimalistic configuration described above (address and data buses only,
-pluc clock and read/write signal). Additionally, `PHI1O` and `PHI2O` pins are connected to LEDs on
+The photo demonstrates the minimal configuration described above (address and data buses only,
+plus clock and read/write signals). Additionally, the `PHI1O` and `PHI2O` pins are connected to LEDs on
 the breadboard for monitoring clock cycles. Finally, there is a button for manually controlling
 reset function of the CPU.
 
@@ -114,26 +115,25 @@ correctness of your wiring, and double-check it before powering up your board.
 1. Click menu `Sketch / Compile` to compile
 1. Click menu `Sketch / Upload` tu upload to Teensy board
 
-### With Arduino CLI...
+### With Arduino CLI
 
-#### ...and NIX packages
+Follow [this post](https://forum.pjrc.com/index.php?threads/arduino-cli-and-ide-now-released-teensy-supported.53548/page-5#post-299430) to see how to configure Arduino CLI with Teensy.
 
-If you are not using Nix packages, then you don't know how much you miss
-in terms of convenience and reproducible dev environemnts -
-[start](https://nixos.org/download) today :-)
+- to compile: `make`
+- to upload `make upload`
 
-There are no prerequisites. The only thing required is working Nix environment.
+Make sure that the port name in `Makefile` is the correct one. To find the port name execute
+`arduino-cli board list`
+
+##### Install Arduino CLI and dependencies with Nix and Direnv
+
+If you are not using Nix packages, then you don't know how much you miss in terms of convenience and reproducible dev environments - [start](https://nixos.org/download) today :-)
 
 1. Clone the repo and cd project's directory
 1. If you use [direnv](https://direnv.net/), just execute `direnv allow`, otherwise type `nix-shell`
 1. Wait until all dependencies will be downloaded and configured
-1. To compile, type:
-1. To upload:
-1. To format your code changes: `treefmt`
-
-#### Without NIX
-
-TBD
+1. I added [`treefmt`](https://github.com/numtide/treefmt) to dependencies, so you can format the
+   code after changes by just executing `treefmt`
 
 ## Working with other CPUs from the 6502-family
 
@@ -148,3 +148,5 @@ switch to your desired CPU.
 
 Please note that other processors from the 6502-family have different pin layout,
 so this code needs to be adjusted in order to make them work.
+
+## References
