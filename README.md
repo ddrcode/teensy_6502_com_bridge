@@ -92,6 +92,35 @@ In order to adjust the pin mapping please modify `PINS_MAP` macro definition in 
 | 31         | 19      | A10          |      | A12           | 22      | 33         |
 | 32         | 20      | A11          |      | Ground        | 21      | Ground     |
 
+## Compilation and execution
+
+### With Arduino IDE and Teensyduino
+
+1. Install [Arduino IDE](https://www.arduino.cc/en/software)
+1. Install and configure [Teensyduino](https://www.pjrc.com/teensy/teensyduino.html)
+1. Clone this project into your Arduino sketches folder (usually `~/Arduino/sketches`)
+1. Click menu `Sketch / Compile` to compile
+1. Click menu `Sketch / Upload` tu upload to Teensy board
+
+### With Arduino CLI...
+
+#### ...and NIX packages
+
+If you are not using Nix packages, then you don't know how much you miss
+in terms of convenience and reproducible dev environemnts -
+[start](https://nixos.org/download) today :-)
+
+1. Clone the repo and cd project's directory
+1. If you use [direnv](https://direnv.net/), just execute `direnv allow`, otherwise type `nix-shell`
+1. Wait until all dependencies will be downloaded and configured
+1. To compile, type:
+1. Ty upload:
+1. To format your code changes: `treefmt`
+
+#### Without NIX
+
+TBD
+
 ## Working with other CPUs from the 6502-family
 
 This project is meant to work specifically with W65C02 CPU. The main reason
