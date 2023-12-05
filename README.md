@@ -7,12 +7,12 @@ The main purpose for this project is to provide cycle-by-cycle debugging capabil
 other purpose too, i.e.:
 
 - __Comparative debugging for emulators__:
-    You can run your 6502-family emulator in parallel with an actual CPU to compare the results
-    in order to measure the accuracy of an emulator.
+  You can run your 6502-family emulator in parallel with an actual CPU to compare the results
+  in order to measure the accuracy of an emulator.
 - __Emulated 8-bit computers with a physical processor__:
-    You can implemented an emulator of an 8-bit, 6502-based computer (i.e. C64), that will work
-    (via this bridge) with a real CPU, while other compnents of the system (like RAM, ROM,
-    video chip) remain emulated.
+  You can implemented an emulator of an 8-bit, 6502-based computer (i.e. C64), that will work
+  (via this bridge) with a real CPU, while other compnents of the system (like RAM, ROM,
+  video chip) remain emulated.
 
 ## Connection
 
@@ -48,6 +48,7 @@ Below there is a pinout diagram of the W65C02 CPU
 ```
 
 In the minimalistic configuration the following pins must be connected with the board:
+
 - `A0-A15` - address bus (input)
 - `D0-D7` - data bus (input or output; input by default)
 - `RW` - read/write input; it informs whether the data bus is in read or write state
@@ -63,25 +64,25 @@ and `RDY` pin should be connected with power via resistor.
 The table below illustrates the default configuration of the bridge. In order to adjust pin mapping
 please modify `PINS_MAP` macro definition in the source file.
 
-| Teensy pin# | CPU Pin# | CPU Pin name | ←  → | CPU Pin name | CPU Pin# | Teensy pin# |
-| ----------- | -------- | ------------ | ---- | ------------ | -------- | ----------- |
-|             |        1 | Vector pull  |      | Reset        | 40       |             |
-|             |        2 | Ready        |      | PHI2O        | 39       |             |
-|             |        3 | PHI1O        |      | Set overflow | 38       |             |
-|             |        4 | IRQ          |      | PHI2         | 37       | 23          |
-|             |        5 | Memory lock  |      | Bus enable   | 36       |             |
-|             |        6 | NMI          |      | No connection| 35       |             |
-|             |        7 | SYNC         |      | Read/Write   | 34       | 21          |
-| 3.3V        |        8 | Power        |      | D0           | 33       | 20          |
-| 10          |        9 | A0           |      | D1           | 32       | 19          |
-| 11          |       10 | A1           |      | D2           | 31       | 18          |
-| 12          |       11 | A2           |      | D3           | 30       | 17          |
-| 24          |       12 | A3           |      | D4           | 29       | 16          |
-| 25          |       13 | A4           |      | D5           | 28       | 15          |
-| 26          |       14 | A5           |      | D6           | 27       | 14          |
-| 27          |       15 | A6           |      | D7           | 26       | 13          |
-| 28          |       16 | A7           |      | A15          | 25       | 36          |
-| 29          |       17 | A8           |      | A14          | 24       | 35          |
-| 30          |       18 | A9           |      | A13          | 23       | 34          |
-| 31          |       19 | A10          |      | A12          | 22       | 33          |
-| 32          |       20 | A11          |      | Ground       | 21       | Ground      |
+| Teensy pin# | CPU Pin# | CPU Pin name | ←  → | CPU Pin name  | CPU Pin# | Teensy pin# |
+| ----------- | -------- | ------------ | ---- | ------------- | -------- | ----------- |
+|             | 1        | Vector pull  |      | Reset         | 40       |             |
+|             | 2        | Ready        |      | PHI2O         | 39       |             |
+|             | 3        | PHI1O        |      | Set overflow  | 38       |             |
+|             | 4        | IRQ          |      | PHI2          | 37       | 23          |
+|             | 5        | Memory lock  |      | Bus enable    | 36       |             |
+|             | 6        | NMI          |      | No connection | 35       |             |
+|             | 7        | SYNC         |      | Read/Write    | 34       | 21          |
+| 3.3V        | 8        | Power        |      | D0            | 33       | 20          |
+| 10          | 9        | A0           |      | D1            | 32       | 19          |
+| 11          | 10       | A1           |      | D2            | 31       | 18          |
+| 12          | 11       | A2           |      | D3            | 30       | 17          |
+| 24          | 12       | A3           |      | D4            | 29       | 16          |
+| 25          | 13       | A4           |      | D5            | 28       | 15          |
+| 26          | 14       | A5           |      | D6            | 27       | 14          |
+| 27          | 15       | A6           |      | D7            | 26       | 13          |
+| 28          | 16       | A7           |      | A15           | 25       | 36          |
+| 29          | 17       | A8           |      | A14           | 24       | 35          |
+| 30          | 18       | A9           |      | A13           | 23       | 34          |
+| 31          | 19       | A10          |      | A12           | 22       | 33          |
+| 32          | 20       | A11          |      | Ground        | 21       | Ground      |

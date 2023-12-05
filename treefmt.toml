@@ -1,0 +1,10 @@
+[formatter.cpp]
+command = "astyle"
+options = ["--style=mozilla", "-n"]
+includes = [ "*.ino", "*.h" ]
+excludes = []
+
+[formatter.markdown]
+command = "mdformat"
+includes = ["*.md"]
+
