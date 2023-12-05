@@ -66,7 +66,7 @@ and `RDY` pin should be connected with power via resistor.
 ### Default configuration
 
 The table below illustrates the default configuration of this project.
-In order to adjust the pin mapping please modify `PINS_MAP` macro definition in the
+In order to adjust the pin mapping, modify `PINS_MAP` macro definition in the
 [configuration file](./configuration.h).
 
 | Teensy pin | CPU pin | CPU pin name | ←  → | CPU Pin name  | CPU pin | Teensy pin |
@@ -92,6 +92,18 @@ In order to adjust the pin mapping please modify `PINS_MAP` macro definition in 
 | 31         | 19      | A10          |      | A12           | 22      | 33         |
 | 32         | 20      | A11          |      | Ground        | 21      | Ground     |
 
+### Example
+![Example wiring](./assets/board.jpg)
+The photo demonstrate the minimalistic configuration described above (address and data buses only,
+pluc clock and read/write signal). Additionally, `PHI1O` and `PHI2O` pins are connected to LEDs on
+the breadboard for monitoring clock cycles. Finally, there is a button for manually controlling
+reset function of the CPU.
+
+### Warning
+
+Incorrect connection may destroy the CPU. Please take extra attention to the
+correctness of your wiring, and double-check it before powering up your board.
+
 ## Compilation and execution
 
 ### With Arduino IDE and Teensyduino
@@ -110,11 +122,13 @@ If you are not using Nix packages, then you don't know how much you miss
 in terms of convenience and reproducible dev environemnts -
 [start](https://nixos.org/download) today :-)
 
+There are no prerequisites. The only thing required is working Nix environment.
+
 1. Clone the repo and cd project's directory
 1. If you use [direnv](https://direnv.net/), just execute `direnv allow`, otherwise type `nix-shell`
 1. Wait until all dependencies will be downloaded and configured
 1. To compile, type:
-1. Ty upload:
+1. To upload:
 1. To format your code changes: `treefmt`
 
 #### Without NIX
