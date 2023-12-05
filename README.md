@@ -135,7 +135,7 @@ If you are not using Nix packages, then you don't know how much you miss in term
 1. I added [`treefmt`](https://github.com/numtide/treefmt) to dependencies, so you can format the
    code after changes by just executing `treefmt`
 
-## Working with other CPUs from the 6502-family
+## Working with other CPUs from the 6502 family
 
 This project is meant to work specifically with W65C02 CPU. The main reason
 is that W65C02 is static, that means it can be easily step-by-step cycled at any speed,
@@ -146,7 +146,10 @@ limitations of a minimum speed (~100kHz). This bridge would still work with thes
 Perhaps a good workflow could be to test/debug your project with W65C02 and then
 switch to your desired CPU.
 
-Please note that other processors from the 6502-family have different pin layout,
+Please note that other processors from the 6502 family have different pin layout,
 so this code needs to be adjusted in order to make them work.
 
 ## References
+- [W65C02 datasheet](https://westerndesigncenter.com/wdc/documentation/w65c02s.pdf)
+- [Teensy 4.1](https://www.pjrc.com/store/teensy41.html)
+- [6502 Primer: What do I do with the "mystery" pins](https://wilsonminesco.com/6502primer/MysteryPins.html)

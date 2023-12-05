@@ -1,7 +1,7 @@
 [formatter.cpp]
 command = "astyle"
 options = ["--style=mozilla", "-n"]
-includes = [ "*.ino", "*.h" ]
+includes = [ "*.ino", "*.h", "*.cpp" ]
 excludes = []
 
 [formatter.markdown]

@@ -7,6 +7,30 @@
 //--------------------------------------------------------------------------
 // TYPES
 
+// W65C02 Pinout:
+//
+//            +------------+
+//     VP <-- |  1      40 | <-- RES
+//    RDY <-> |  2      39 | --> PHI2O
+//  PHI1O <-- |  3      38 | <-- SO
+//    IRQ --> |  4      37 | <-- PHI2
+//     ML <-- |  5     @36 | <-- BE
+//    NMI --> |  6      35 | --- NC
+//   SYNC <-- |  7     *34 | --> RW
+//    VDD --> |  8     *33 | <-> D0
+//     A0 <-- |  9*    *32 | <-> D1
+//     A1 <-- | 10*    *31 | <-> D2
+//     A2 <-- | 11*    *30 | <-> D3
+//     A3 <-- | 12*    *29 | <-> D4
+//     A4 <-- | 13*    *28 | <-> D5
+//     A5 <-- | 14*    *27 | <-> D6
+//     A6 <-- | 15*    *26 | <-> D7
+//     A7 <-- | 16*    *25 | --> A15
+//     A8 <-- | 17*    *24 | --> A14
+//     A9 <-- | 18*    *23 | --> A13
+//    A10 <-- | 19*    *22 | --> A12
+//    A11 <-- | 20*     21 | --> GND
+//            +------------+
 typedef struct t_w64c02_pins
 {
     // cpu control
@@ -42,6 +66,7 @@ pins_t setup_pins(void);
 
 int pin_ids[40];
 auto pins = setup_pins();
+uint8_t buff[5];
 
 void setup()
 {
@@ -71,7 +96,9 @@ void loop()
     delay(CYCLE_DURATION);
     handle_cycle(pins);
     //print_status(pins);
-    pins_to_num();
+    get_pins_state(buff);
+    Serial.write(buff, 5);
+    Serial.flush();
 }
 
 void print_status(pins_t &pins)
@@ -112,48 +139,12 @@ int get_val_from_pins(int addr_pins[], int len)
     return addr;
 }
 
-//            +------------+
-//     VP <-- |  1      40 | <-- RES
-//    RDY <-> |  2      39 | --> PHI2O
-//  PHI1O <-- |  3      38 | <-- SO
-//    IRQ --> |  4      37 | <-- PHI2
-//     ML <-- |  5     @36 | <-- BE
-//    NMI --> |  6      35 | --- NC
-//   SYNC <-- |  7     *34 | --> RW
-//    VDD --> |  8     *33 | <-> D0
-//     A0 <-- |  9*    *32 | <-> D1
-//     A1 <-- | 10*    *31 | <-> D2
-//     A2 <-- | 11*    *30 | <-> D3
-//     A3 <-- | 12*    *29 | <-> D4
-//     A4 <-- | 13*    *28 | <-> D5
-//     A5 <-- | 14*    *27 | <-> D6
-//     A6 <-- | 15*    *26 | <-> D7
-//     A7 <-- | 16*    *25 | --> A15
-//     A8 <-- | 17*    *24 | --> A14
-//     A9 <-- | 18*    *23 | --> A13
-//    A10 <-- | 19*    *22 | --> A12
-//    A11 <-- | 20*     21 | --> GND
-//            +------------+
-// void set_buff(pins_t &pins, int buff2[40]) {
-//   int buff[] = {
-//     0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-//     0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-//     0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-//     0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-//   };
-// }
 
-void pins_to_num()
+void get_pins_state(uint8_t buff[5])
 {
-    char buff[] = { 0,0,0,0,0 };
-    int i = 0;
     for (int i=0; i<40; ++i) {
         buff[i/8] |= digitalRead(pin_ids[i]) == HIGH ? (1<<(i/8)) : 0;
     }
-    for (i=4; i>=0; --i) {
-        Serial.print(buff[i], BIN);
-    }
-    Serial.println();
 }
 
 pins_t setup_pins(void)
