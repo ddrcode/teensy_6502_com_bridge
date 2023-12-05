@@ -97,7 +97,7 @@ void loop()
     handle_cycle(pins);
     //print_status(pins);
     get_pins_state(buff);
-    Serial.write(buff, 5);
+    Serial.write(buff[0]);
     Serial.flush();
 }
 
