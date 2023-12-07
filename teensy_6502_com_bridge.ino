@@ -4,6 +4,8 @@
 #include <_Teensy.h>
 #include "configuration.h"
 
+#define BUFFSIZE 5
+
 //--------------------------------------------------------------------------
 // TYPES
 
@@ -66,7 +68,7 @@ pins_t setup_pins(void);
 
 int pin_ids[40];
 auto pins = setup_pins();
-uint8_t buff[5];
+uint8_t buff[BUFFSIZE];
 
 void setup()
 {
@@ -92,13 +94,23 @@ void setup()
 
 void loop()
 {
+    static int cycle = 0;
+
+    // do nothihng until serial connected
+    if (!Serial.dtr()) {
+        return;
+    }
+
+    if (cycle > 60) return;
+
     digitalToggle(pins.phi2);
     delay(CYCLE_DURATION);
     handle_cycle(pins);
-    //print_status(pins);
-    get_pins_state(buff);
-    Serial.write(buff[0]);
-    Serial.flush();
+    print_status(pins);
+    ++cycle;
+    // get_pins_state(buff);
+    // Serial.write(buff, BUFFSIZE);
+    // Serial.send_now();
 }
 
 void print_status(pins_t &pins)
@@ -106,11 +118,13 @@ void print_status(pins_t &pins)
     Serial.print("RW=");
     Serial.print(digitalRead(pins.rw));
     Serial.print(", Addr=");
-    Serial.print(get_val_from_pins(pins.addr, 16), BIN);
+    Serial.print(get_val_from_pins(pins.addr, 16), HEX);
     Serial.print(", Data=");
     Serial.print(get_val_from_pins(pins.data, 8), BIN);
-    Serial.print(", All pins=");
-    //Serial.print(pins_to_num());
+    Serial.print(", Pin35=");
+    Serial.print(digitalRead(35), BIN);
+    Serial.print(", Pin36=");
+    Serial.print(digitalRead(36), BIN);
     Serial.println();
 }
 
@@ -139,11 +153,16 @@ int get_val_from_pins(int addr_pins[], int len)
     return addr;
 }
 
-
-void get_pins_state(uint8_t buff[5])
+void get_pins_state(uint8_t buff[BUFFSIZE])
 {
-    for (int i=0; i<40; ++i) {
-        buff[i/8] |= digitalRead(pin_ids[i]) == HIGH ? (1<<(i/8)) : 0;
+    for(int i=0; i<BUFFSIZE; ++i) {
+        buff[i] = 0;
+        for(int j=0; j < 8; ++j) {
+            auto id = pin_ids[i*8 + j];
+            if (id > 0) {
+                buff[i] |= digitalRead(id) == HIGH ? 1 << j : 0;
+            }
+        }
     }
 }
 
@@ -164,7 +183,7 @@ pins_t setup_pins(void)
         .irq = p[3],
         .nmi = p[5],
         .rw = p[33],
-        .addr = { p[9], p[10], p[11], p[12], p[13], p[14], p[15], p[16], p[17], p[18], p[19], p[21], p[22], p[23], p[24] },
+        .addr = { p[8], p[9], p[10], p[11], p[12], p[13], p[14], p[15], p[16], p[17], p[18], p[19], p[21], p[22], p[23], p[24] },
         .data = { p[32], p[31], p[30], p[29], p[28], p[27], p[26], p[25] },
         .sync = p[6],
         .vp = p[0]

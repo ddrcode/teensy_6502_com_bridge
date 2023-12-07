@@ -150,6 +150,7 @@ Please note that other processors from the 6502 family have different pin layout
 so this code needs to be adjusted in order to make them work.
 
 ## References
+
 - [W65C02 datasheet](https://westerndesigncenter.com/wdc/documentation/w65c02s.pdf)
 - [Teensy 4.1](https://www.pjrc.com/store/teensy41.html)
 - [6502 Primer: What do I do with the "mystery" pins](https://wilsonminesco.com/6502primer/MysteryPins.html)

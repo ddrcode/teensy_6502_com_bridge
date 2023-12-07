@@ -4,27 +4,14 @@
 #include <fcntl.h>
 #include <sstream>
 
-void testSerialComm()
-{
-    std::string port = "/dev/cu.usbmodem122057101";
-    int device = open(port.c_str(), O_RDWR | O_NOCTTY | O_SYNC);
-
-    uint8_t buffer[5];
-
-    do {
-        int n = read(device, buffer, sizeof buffer);
-
-        // if (n > 0) {
-            std::cout << buffer;
-        // }
-
-    } while (buffer[0] != 'X'); // 'X' means end of transmission
-
-    close(device);
-}
+#include "configuration.h"
+#include "runner.h"
 
 int main(int argc, char *argv[])
 {
-    testSerialComm();
+    int device = open(std::string(PORT).c_str(), O_RDWR | O_NOCTTY | O_SYNC);
+    Memory mem;
+    Runner runner = Runner(device, &mem);
+    runner.run();
     return 0;
 }
