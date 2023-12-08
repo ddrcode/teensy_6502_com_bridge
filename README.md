@@ -123,15 +123,15 @@ Follow [this post](https://forum.pjrc.com/index.php?threads/arduino-cli-and-ide-
 - to upload `make upload`
 
 Make sure that the port name in `Makefile` is the correct one. To find the port name execute
-`arduino-cli board list`
+`arduino-cli board list`. You must have Teensy plugged in to have the port visible.
 
 ##### Install Arduino CLI and dependencies with Nix and Direnv
 
 If you are not using Nix packages, then you don't know how much you miss in terms of convenience and reproducible dev environments - [start](https://nixos.org/download) today :-)
 
 1. Clone the repo and cd project's directory
-1. If you use [direnv](https://direnv.net/), just execute `direnv allow`, otherwise type `nix-shell`
-1. Wait until all dependencies will be downloaded and configured
+1. If you use [Direnv](https://direnv.net/), just execute `direnv allow`, otherwise type `nix-shell`
+1. Wait until all dependencies download and configure
 1. I added [`treefmt`](https://github.com/numtide/treefmt) to dependencies, so you can format the
    code after changes by just executing `treefmt`
 

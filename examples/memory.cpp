@@ -1,10 +1,14 @@
-#include "memory.h"
+#include <cstdio>
+#include <iostream>
+#include "memory.hpp"
 
-Memory::Memory()
+using namespace std;
+
+Memory::Memory(const uint16_t program_addr)
 {
-    // hardcode reset vector to $0200
-    this->write_byte(0xfffd, 0x02);
-    this->write_byte(0xfffc, 0x00);
+    this->program_addr = program_addr;
+    this->write_byte(0xfffd, (program_addr & 0xff00) >> 8);
+    this->write_byte(0xfffc, program_addr & 0xff);
 }
 
 uint8_t Memory::read_byte(uint16_t addr)
@@ -16,3 +20,25 @@ void Memory::write_byte(uint16_t addr, uint8_t val)
 {
     this->data[addr] = val;
 }
+
+void Memory::load_program(std::string filename)
+{
+    static const int BUFFERSIZE = 1024;
+    FILE* filp = fopen(filename.c_str(), "rb");
+    if (!filp) {
+        cout <<  "Error: could not open file " << filename << endl;
+        exit(1);
+    }
+
+    char * buffer = new char[BUFFERSIZE];
+    int bytes;
+    int cursor = this->program_addr;
+    while ((bytes = fread(buffer, sizeof(char), BUFFERSIZE, filp)) > 0) {
+        for (int i = 0; i < bytes; ++i) {
+            this->write_byte(cursor++, (uint8_t)buffer[i]);
+        }
+    }
+
+    fclose(filp);
+}
+

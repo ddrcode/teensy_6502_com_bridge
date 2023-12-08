@@ -1,8 +1,8 @@
 #include <iostream>
 #include <unistd.h>
 
-#include "runner.h"
-#include "pin_utils.h"
+#include "runner.hpp"
+#include "pin_utils.hpp"
 
 using namespace std;
 
@@ -65,7 +65,7 @@ void Runner::read_serial()
 
 void Runner::write_serial()
 {
-    write(this->device, this->buff, BUFFSIZE);
+    auto _ = write(this->device, this->buff, BUFFSIZE);
 }
 
 void Runner::advance_cycles()

@@ -4,6 +4,7 @@ pkgs.mkShell {
   packages = with pkgs; [
     arduino-cli
     arduino-language-server
+    cpplint
     treefmt
     astyle
     python311Packages.mdit-py-plugins

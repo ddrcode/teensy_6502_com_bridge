@@ -1,4 +1,6 @@
-#include "memory.h"
+#pragma once
+
+#include "memory.hpp"
 
 #define BUFFSIZE 5
 

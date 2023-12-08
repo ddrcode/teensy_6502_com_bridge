@@ -1,5 +1,5 @@
 #include <bitset>
-#include "pin_utils.h"
+#include "pin_utils.hpp"
 
 using namespace std;
 
@@ -52,6 +52,7 @@ string pins_to_string(uint8_t pins[])
     return result;
 }
 
-string addr_to_binary_str(uint16_t addr) {
+string addr_to_binary_str(uint16_t addr)
+{
     return bitset<16>(addr).to_string();
 }
