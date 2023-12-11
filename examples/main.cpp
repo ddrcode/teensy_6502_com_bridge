@@ -11,6 +11,10 @@ int main(int argc, char *argv[])
 {
     // open COM port device
     int device = open(std::string(PORT).c_str(), O_RDWR | O_NOCTTY | O_SYNC);
+    if (device < 0) {
+        std::cout << "Couldn't open COM port: " << PORT << std::endl;
+        exit(1);
+    }
 
     // instantiate memory emulation and load example program
     Memory mem(PROGRAM_ADDR);

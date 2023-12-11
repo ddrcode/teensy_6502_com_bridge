@@ -2,6 +2,7 @@
 
 pkgs.mkShell {
   packages = with pkgs; [
+    acme
     arduino-cli
     arduino-language-server
     cpplint
