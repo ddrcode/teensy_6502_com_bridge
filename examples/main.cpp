@@ -18,11 +18,15 @@ int main(int argc, char *argv[])
 
     // instantiate memory emulation and load example program
     Memory mem(PROGRAM_ADDR);
-    mem.load_program(PROGRAM_FILE);
+    if (!mem.load_program(PROGRAM_FILE)) {
+        std::cout <<  "Error: could not open file " << PROGRAM_FILE << std::endl;
+        exit(1);
+    }
 
     // execute program on connected CPU with emulated RAM
     Runner runner = Runner(device, &mem);
     runner.run();
 
+    close(device);
     return 0;
 }

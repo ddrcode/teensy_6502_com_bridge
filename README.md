@@ -63,6 +63,12 @@ In the minimalistic configuration the following CPU pins must be connected to th
 In such configuration `RES`, `IRQ`, `NMI` and `BE` pins must be also connected to 3.3V
 and `RDY` pin should be connected with power via resistor.
 
+Please note that the `RES` (pin 40) must be kept low for at least two cycles on power on.
+That can be achieved programmatically, but if the intention is not to connect RST pin to
+Teensy or to have proper control over reset state (i.e. in case of power failure),
+then the best option is to connect the pin via
+[DS1813](https://www.mouser.co.uk/datasheet/2/609/DS1813-3122044.pdf)
+
 ### Default configuration
 
 The table below illustrates the default configuration of this project.

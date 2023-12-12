@@ -11,5 +11,5 @@ public:
     Memory(const uint16_t program_addr);
     uint8_t read_byte(uint16_t addr);
     void write_byte(uint16_t addr, uint8_t val);
-    void load_program(std::string filename);
+    bool load_program(std::string filename);
 };

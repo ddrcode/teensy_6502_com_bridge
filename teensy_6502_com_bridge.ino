@@ -61,32 +61,51 @@ typedef struct t_w64c02_pins
     int vp;  // vector pull
 } pins_t;
 
-pins_t setup_pins(void);
+pins_t setup_pins(int pins[]);
 
 //--------------------------------------------------------------------------
 // GLOBAL DATA
 
 int pin_ids[40];
-auto pins = setup_pins();
+auto pins = setup_pins(pin_ids);
 uint8_t buff[BUFFSIZE];
 
 void setup()
 {
-    Serial.begin(9600);
+    Serial.begin(9600); // value ignored on Teensy for USB connection
+
+    // cpu status
     pinMode(pins.rw, INPUT);
-    // pinMode(pins.irq, OUTPUT);
-    // pinMode(pins.nmi, OUTPUT);
+    pinMode(pins.sync, INPUT);
+    pinMode(pins.vp, INPUT);
+    pinMode(pins.ml, INPUT);
+
+    // cpu control
+    pinMode(pins.irq, OUTPUT);
+    pinMode(pins.nmi, OUTPUT);
+    pinMode(pins.reset, OUTPUT);
+    pinMode(pins.ready, OUTPUT);
+    pinMode(pins.be, OUTPUT);
+    pinMode(pins.so, OUTPUT);
 
     // clock
-    // pinMode(pins.phi1o, INPUT);
+    pinMode(pins.phi1o, INPUT);
     pinMode(pins.phi2, OUTPUT);
-    // pinMode(pins.phi2o, INPUT);
+    pinMode(pins.phi2o, INPUT);
 
     // data
     set_data_pins(pins.data, INPUT);
     for (int i = 0; i < 16; ++i) {
         pinMode(pins.addr[i], INPUT);
     }
+
+    // intialize output pins
+    digitalWrite(pins.irq, HIGH);
+    digitalWrite(pins.nmi, HIGH);
+    // digitalWrite(pins.ready, HIGH);
+    digitalWrite(pins.be, HIGH);
+    // digitalWrite(pins.so, HIGH);
+    reset();
 }
 
 //--------------------------------------------------------------------------
@@ -95,22 +114,37 @@ void setup()
 void loop()
 {
     static int cycle = 0;
+    static bool phase = true;
 
     // do nothihng until serial connected
     if (!Serial.dtr()) {
         return;
     }
 
-    if (cycle > 60) return;
+    digitalWrite(pins.irq, HIGH);
+    digitalWrite(pins.nmi, HIGH);
+    digitalWrite(pins.ready, HIGH);
+    digitalWrite(pins.be, HIGH);
+    digitalWrite(pins.so, HIGH);
 
     digitalToggle(pins.phi2);
     delay(CYCLE_DURATION);
     handle_cycle(pins);
-    print_status(pins);
+    // if (phase) print_status(pins);
     ++cycle;
-    // get_pins_state(buff);
-    // Serial.write(buff, BUFFSIZE);
-    // Serial.send_now();
+    phase = !phase;
+    get_pins_state(buff);
+    Serial.write(buff, BUFFSIZE);
+    Serial.send_now();
+}
+
+void reset() {
+    digitalWrite( pins.reset, LOW);
+    delay(CYCLE_DURATION);
+    digitalWrite( pins.reset, LOW);
+    delay(CYCLE_DURATION);
+    digitalWrite( pins.reset, HIGH);
+    delay(CYCLE_DURATION);
 }
 
 void print_status(pins_t &pins)
@@ -144,7 +178,7 @@ void set_data_pins(int data[8], int direction)
     }
 }
 
-int get_val_from_pins(int addr_pins[], int len)
+uint16_t get_val_from_pins(int addr_pins[], int len)
 {
     int addr = 0;
     for (int i = 0; i < len; ++i) {
@@ -166,7 +200,7 @@ void get_pins_state(uint8_t buff[BUFFSIZE])
     }
 }
 
-pins_t setup_pins(void)
+pins_t setup_pins(int pin_ids[])
 {
     set_pin_ids(pin_ids);
     auto p = pin_ids;

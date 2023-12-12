@@ -21,13 +21,12 @@ void Memory::write_byte(uint16_t addr, uint8_t val)
     this->data[addr] = val;
 }
 
-void Memory::load_program(std::string filename)
+bool Memory::load_program(std::string filename)
 {
     static const int BUFFERSIZE = 1024;
     FILE* filp = fopen(filename.c_str(), "rb");
     if (!filp) {
-        cout <<  "Error: could not open file " << filename << endl;
-        exit(1);
+        return false;
     }
 
     char * buffer = new char[BUFFERSIZE];
@@ -40,5 +39,6 @@ void Memory::load_program(std::string filename)
     }
 
     fclose(filp);
+    return true;
 }
 
