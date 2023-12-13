@@ -16,6 +16,4 @@ is emulated with a simple byte array in the program.
 
 ## How does the example work?
 
-
-
 ## Test program

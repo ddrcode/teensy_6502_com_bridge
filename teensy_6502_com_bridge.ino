@@ -33,6 +33,9 @@
 //    A10 <-- | 19*    *22 | --> A12
 //    A11 <-- | 20*     21 | --> GND
 //            +------------+
+//
+//   * - tri-state, / - active on low, @ - async
+//
 typedef struct t_w64c02_pins
 {
     // cpu control
@@ -69,6 +72,9 @@ pins_t setup_pins(int pins[]);
 int pin_ids[40];
 auto pins = setup_pins(pin_ids);
 uint8_t buff[BUFFSIZE];
+
+//--------------------------------------------------------------------------
+// PUBLIC API
 
 void setup()
 {
@@ -108,18 +114,33 @@ void setup()
     reset();
 }
 
-//--------------------------------------------------------------------------
-// PUBLIC API
-
 void loop()
 {
-    static int cycle = 0;
-    static bool phase = true;
-
     // do nothihng until serial connected
     if (!Serial.dtr()) {
         return;
     }
+
+#ifdef DEBUG_TEENSY_COM_BRIDGE
+    loop_debug();
+#else
+    loop_prod();
+#endif
+}
+
+void loop_prod()
+{
+    handle_cycle(pins);
+    get_pins_state(buff);
+    Serial.write(buff, BUFFSIZE);
+    Serial.send_now();
+}
+
+#ifdef DEBUG_TEENSY_COM_BRIDGE
+void loop_debug()
+{
+    static int cycle = 0;
+    static bool phase = true;
 
     digitalWrite(pins.irq, HIGH);
     digitalWrite(pins.nmi, HIGH);
@@ -130,15 +151,18 @@ void loop()
     digitalToggle(pins.phi2);
     delay(CYCLE_DURATION);
     handle_cycle(pins);
-    // if (phase) print_status(pins);
+    if (phase) print_status(pins);
     ++cycle;
     phase = !phase;
-    get_pins_state(buff);
-    Serial.write(buff, BUFFSIZE);
-    Serial.send_now();
 }
+#endif
 
-void reset() {
+void reset()
+{
+#ifndef DEBUG_TEENSY_COM_BRIDGE
+    static const int CYCLE_DURATION = 50;
+#endif
+
     digitalWrite( pins.reset, LOW);
     delay(CYCLE_DURATION);
     digitalWrite( pins.reset, LOW);
@@ -147,6 +171,7 @@ void reset() {
     delay(CYCLE_DURATION);
 }
 
+#ifdef DEBUG_TEENSY_COM_BRIDGE
 void print_status(pins_t &pins)
 {
     Serial.print("RW=");
@@ -161,6 +186,7 @@ void print_status(pins_t &pins)
     Serial.print(digitalRead(36), BIN);
     Serial.println();
 }
+#endif
 
 //--------------------------------------------------------------------------
 // LOCAL FUNCTIONS

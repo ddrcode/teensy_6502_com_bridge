@@ -1,14 +1,23 @@
 // CONFIGURATION
 // Edit this section to adjust the config to your project.
 
+// uncomment the line below if you want to test the project
+// without any client app, just serial monitor
+// This is handy in case of testing the correctness of your wiring.
+// #define DEBUG_TEENSY_COM_BRIDGE
+
+#ifdef DEBUG_TEENSY_COM_BRIDGE
+// the clock (in ms) is required only for debug mode.
+// The bridge itself is being "clocked" by the COM port
+// messages and as such doesn't provide any notion of cycles.
 #define CYCLE_DURATION 500
+#endif
 
 // PIN CONFIGURATION
 // For each W65C02 PIN (as in the comments), provide Teensy 4.1 pin no.
 // Pins 8, 21 and 35 are not data pins, so they can be ignored.
 // Pins 4, 6, 36 and 40 can be skipped if connected directly to power.
 // Pin 2 can be skipped if connected to power via resistor.
-
 #define PINS_MAP \
    2,  /*     VP <-- |  1      40 | <-- RES   */     18, \
   21,  /*    RDY <-> |  2      39 | --> PHI2O */      1, \
