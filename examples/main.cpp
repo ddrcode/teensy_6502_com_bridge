@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
     }
 
     // instantiate memory emulation and load example program
-    Memory mem(PROGRAM_ADDR);
+    Memory mem(PROGRAM_ADDR, INTERRUPT_ADDR);
     if (!mem.load_program(PROGRAM_FILE)) {
         std::cout <<  "Error: could not open file " << PROGRAM_FILE << std::endl;
         exit(1);

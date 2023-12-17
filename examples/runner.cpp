@@ -28,11 +28,22 @@ void Runner::reset()
         0b00000000,
         0b10101000  // IRQ, NMI, VDD high
     };
-    this->pins = W65C02Pins(b);
 
-    this->step();
-    this->step();
+    for (int i = 0; i < 4; i++) {
+        this->pins = W65C02Pins(b);
+        this->pins.set_overflow = true;
+        this->pins.phi2 = this->phase;
+        this->write_serial();
+        usleep(100000);
+        this->advance_cycles();
 
+        this->read_serial();
+        usleep(100000);
+        this->advance_cycles();
+    }
+
+    this->pins.data = 0;
+    this->pins.addr = 0;
     this->pins.reset = true;
     this->pins.ready = true;
     this->pins.set_overflow = true;
@@ -40,20 +51,30 @@ void Runner::reset()
 
 bool Runner::step()
 {
+    static uint16_t addr = 0;
+    static bool write = false;
+
     this->pins.phi2 = this->phase;
     this->write_serial();
-    usleep(100000);
-    this->advance_cycles();
+    usleep(50000);
+    // this->advance_cycles();
 
     this->read_serial();
-    if (this->pins.is_write()) {
-        this->mem->write_byte(this->pins.addr, this->pins.data);
+    if (!this->phase) {
+        addr = this->pins.addr;
+        write = this->pins.is_write();
+        if (!write) {
+            this->pins.data = this->mem->read_byte(addr);
+        }
     } else {
-        this->pins.data = this->mem->read_byte(this->pins.addr);
+        if (write) {
+            this->mem->write_byte(addr, this->pins.data);
+        } else {
+            // this->pins.data = this->mem->read_byte(addr);
+        }
+        this->print_state();
     }
-    this->print_state();
-
-    usleep(100000);
+    usleep(50000);
     this->advance_cycles();
 
     return this->cycle < 500;
@@ -78,6 +99,9 @@ void Runner::print_state()
          << ", SYNC " << (int)this->pins.sync
          << ", IRQ " << (int)this->pins.irq
          << ", NMI " << (int)this->pins.nmi
+         << ", RES " << (int)this->pins.reset
+         << ", PHI1O " << (int)this->pins.phi1o
+         << ", PHI2O " << (int)this->pins.phi2o
          << endl;
 }
 

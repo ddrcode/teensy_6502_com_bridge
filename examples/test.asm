@@ -58,3 +58,11 @@ end
         NOP
         NOP
         JMP end
+
+; interrupt handling
+; (although interrupts shouldn't happen in this program)
+* = $0300
+        NOP
+        RTI
+
+
