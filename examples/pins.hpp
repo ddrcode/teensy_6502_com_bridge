@@ -23,6 +23,7 @@ class W65C02Pins {
         W65C02Pins();
         W65C02Pins(uint8_t pins[5]);
 
+        bool is_write();
         void set_pins(uint8_t buff[5]);
         void set_buff(uint8_t buff[5]);
 };

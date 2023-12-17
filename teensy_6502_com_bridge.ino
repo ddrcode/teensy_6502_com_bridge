@@ -131,6 +131,15 @@ void loop()
 
 void loop_prod()
 {
+    static int idx = 0;
+    if (!Serial.available()) return;
+
+    int byte = Serial.read();
+    buff[idx++] = byte;
+
+    if (idx < 5) return;
+    idx = 0;
+    set_pins_state(buff);
     handle_cycle(pins);
     get_pins_state(buff);
     Serial.write(buff, BUFFSIZE);
@@ -167,7 +176,8 @@ void reset()
 }
 
 #ifdef DEBUG_TEENSY_COM_BRIDGE
-void print_pin(std::string label, uint8_t pin) {
+void print_pin(std::string label, uint8_t pin)
+{
     Serial.print(", ");
     Serial.print(label.c_str());
     Serial.print("=");
@@ -224,6 +234,30 @@ void get_pins_state(uint8_t buff[BUFFSIZE])
             }
         }
     }
+}
+
+void set_pins_state(const uint8_t buff[BUFFSIZE])
+{
+    bool phase = digitalRead(pins.phi2o) == HIGH;
+
+    write_pin(buff, 3); // irq
+    write_pin(buff, 5); // nmi
+    write_pin(buff, 35); // be
+    write_pin(buff, 36); // phi2
+    write_pin(buff, 37); // so
+    write_pin(buff, 39); // reset
+
+    if (digitalRead(pins.rw) == HIGH) {
+        for (int i = 32; i > 24; --i) {
+            write_pin(buff, i);
+        }
+    }
+}
+
+void write_pin(const uint8_t buff[BUFFSIZE], uint8_t pin_id)
+{
+    bool val = buff[pin_id / 8] & (1 << (pin_id % 8));
+    digitalWrite(pin_ids[pin_id], val ? HIGH : LOW);
 }
 
 pins_t setup_pins(uint8_t pin_ids[])

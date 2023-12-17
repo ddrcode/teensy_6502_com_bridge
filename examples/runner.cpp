@@ -1,6 +1,7 @@
 #include <iostream>
 #include <unistd.h>
 
+#include "pins.hpp"
 #include "runner.hpp"
 #include "pin_utils.hpp"
 
@@ -14,42 +15,54 @@ Runner::Runner(int device, Memory *mem)
     this->cycle = 0;
 }
 
-void Runner::reset() {
-    // set_data();
+/**
+ * CPU reset procedure. It requires to keep the CPU reset pin (40)
+ * low for two cycles. After that this pin is set high.
+ */
+void Runner::reset()
+{
+    uint8_t b[] = {
+        0b00001010, // BE, RW high
+        0b00000000,
+        0b00000000,
+        0b00000000,
+        0b10101000  // IRQ, NMI, VDD high
+    };
+    this->pins = W65C02Pins(b);
+
+    this->step();
+    this->step();
+
+    this->pins.reset = true;
+    this->pins.ready = true;
+    this->pins.set_overflow = true;
 }
 
 bool Runner::step()
 {
-    this->read_serial();
-    // auto addr = decode_addr(this->buff);
-    // if (this->is_write()) {
-    //     this->mem->write_byte(addr, decode_data(this->buff));
-    // } else {
-    //     set_data(this->buff, this->mem->read_byte(addr));
-    // }
-
-    this->print_state();
+    this->pins.phi2 = this->phase;
+    this->write_serial();
+    usleep(100000);
     this->advance_cycles();
 
-    return this->cycle < 20;
+    this->read_serial();
+    if (this->pins.is_write()) {
+        this->mem->write_byte(this->pins.addr, this->pins.data);
+    } else {
+        this->pins.data = this->mem->read_byte(this->pins.addr);
+    }
+    this->print_state();
+
+    usleep(100000);
+    this->advance_cycles();
+
+    return this->cycle < 500;
 }
 
 void Runner::run()
 {
     this->reset();
-
-    uint8_t b[] = {
-        0b11111110,
-        0b00000010,
-        0b11101111,
-        0b00000001,
-        0b00010010
-    };
-
-    cout << (uint16_t)pin(b, 9) << endl;
-
     while (this->step()) {
-        usleep(250000);
     }
 }
 
@@ -61,6 +74,10 @@ void Runner::print_state()
          << " (" << addr_to_binary_str(this->pins.addr)
          << "), Data: " << hex << (uint16_t)this->pins.data
          << ", R/W: " << (this->pins.rw ? "R" : "W")
+         << ", VP: " << (int)this->pins.vector_pull
+         << ", SYNC " << (int)this->pins.sync
+         << ", IRQ " << (int)this->pins.irq
+         << ", NMI " << (int)this->pins.nmi
          << endl;
 }
 
@@ -87,4 +104,3 @@ void Runner::advance_cycles()
     }
     this->phase = !this->phase;
 }
-

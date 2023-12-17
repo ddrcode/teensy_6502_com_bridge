@@ -1,15 +1,23 @@
 #include "pins.hpp"
 #include "pin_utils.hpp"
 
-W65C02Pins::W65C02Pins() {
+W65C02Pins::W65C02Pins()
+{
     this->set_pins(new uint8_t[5] {0,0,0,0,0});
 }
 
-W65C02Pins::W65C02Pins(uint8_t pins[5]) {
+W65C02Pins::W65C02Pins(uint8_t pins[5])
+{
     this->set_pins(pins);
 }
 
-void W65C02Pins::set_pins(uint8_t pins[5]) {
+bool W65C02Pins::is_write()
+{
+    return !this->rw; // write is on low
+}
+
+void W65C02Pins::set_pins(uint8_t pins[5])
+{
     this->vector_pull = pin(pins, 0);
     this->ready = pin(pins, 1);
     this->phi1o = pin(pins, 2);
@@ -29,7 +37,8 @@ void W65C02Pins::set_pins(uint8_t pins[5]) {
     this->reset = pin(pins, 39);
 }
 
-void W65C02Pins::set_buff(uint8_t buff[5]) {
+void W65C02Pins::set_buff(uint8_t buff[5])
+{
     set_pin(buff, 0, this->vector_pull);
     set_pin(buff, 1, this->ready);
     set_pin(buff, 2, this->phi1o);

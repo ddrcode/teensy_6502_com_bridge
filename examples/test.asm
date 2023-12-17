@@ -55,4 +55,6 @@
         LDY #0
 
 end
-
+        NOP
+        NOP
+        JMP end
