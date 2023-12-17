@@ -2,6 +2,7 @@
 // Created with Teensyduino
 
 #include <_Teensy.h>
+#include <string>
 #include "configuration.h"
 
 #define BUFFSIZE 5
@@ -39,38 +40,38 @@
 typedef struct t_w64c02_pins
 {
     // cpu control
-    int ready;
-    int ml;  // memory lock
-    int be;  // bus enable
-    int so;  // set overflow
-    int reset;
+    uint8_t ready;
+    uint8_t ml;  // memory lock
+    uint8_t be;  // bus enable
+    uint8_t so;  // set overflow
+    uint8_t reset;
 
     // clock
-    int phi1o;
-    int phi2;
-    int phi2o;
+    uint8_t phi1o;
+    uint8_t phi2;
+    uint8_t phi2o;
 
-    // interrupts
-    int irq;
-    int nmi;
+    // uint8_terrupts
+    uint8_t irq;
+    uint8_t nmi;
 
     // data
-    int rw;
-    int addr[16];
-    int data[8];
+    uint8_t rw;
+    uint8_t addr[16];
+    uint8_t data[8];
 
     // monitoring
-    int sync;
-    int vp;  // vector pull
+    uint8_t sync;
+    uint8_t vp;  // vector pull
 } pins_t;
 
-pins_t setup_pins(int pins[]);
+pins_t setup_pins(uint8_t pins[]);
 
 //--------------------------------------------------------------------------
 // GLOBAL DATA
 
-int pin_ids[40];
-auto pins = setup_pins(pin_ids);
+uint8_t pin_ids[40];
+pins_t pins = setup_pins(pin_ids);
 uint8_t buff[BUFFSIZE];
 
 //--------------------------------------------------------------------------
@@ -108,10 +109,10 @@ void setup()
     // intialize output pins
     digitalWrite(pins.irq, HIGH);
     digitalWrite(pins.nmi, HIGH);
-    // digitalWrite(pins.ready, HIGH);
     digitalWrite(pins.be, HIGH);
-    // digitalWrite(pins.so, HIGH);
     reset();
+    digitalWrite(pins.ready, HIGH);
+    digitalWrite(pins.so, HIGH);
 }
 
 void loop()
@@ -142,12 +143,6 @@ void loop_debug()
     static int cycle = 0;
     static bool phase = true;
 
-    digitalWrite(pins.irq, HIGH);
-    digitalWrite(pins.nmi, HIGH);
-    digitalWrite(pins.ready, HIGH);
-    digitalWrite(pins.be, HIGH);
-    digitalWrite(pins.so, HIGH);
-
     digitalToggle(pins.phi2);
     delay(CYCLE_DURATION);
     handle_cycle(pins);
@@ -172,18 +167,23 @@ void reset()
 }
 
 #ifdef DEBUG_TEENSY_COM_BRIDGE
+void print_pin(std::string label, uint8_t pin) {
+    Serial.print(", ");
+    Serial.print(label.c_str());
+    Serial.print("=");
+    Serial.print(digitalRead(pin) == HIGH ? 1 : 0);
+}
+
 void print_status(pins_t &pins)
 {
-    Serial.print("RW=");
-    Serial.print(digitalRead(pins.rw));
-    Serial.print(", Addr=");
+    Serial.print("Addr=");
     Serial.print(get_val_from_pins(pins.addr, 16), HEX);
     Serial.print(", Data=");
     Serial.print(get_val_from_pins(pins.data, 8), BIN);
-    Serial.print(", Pin35=");
-    Serial.print(digitalRead(35), BIN);
-    Serial.print(", Pin36=");
-    Serial.print(digitalRead(36), BIN);
+    print_pin("RW", pins.rw);
+    print_pin("SYNC", pins.sync);
+    print_pin("VP", pins.vp);
+    print_pin("ML", pins.ml);
     Serial.println();
 }
 #endif
@@ -197,14 +197,14 @@ void handle_cycle(pins_t &pins)
     set_data_pins(pins.data, rw == HIGH ? OUTPUT : INPUT);
 }
 
-void set_data_pins(int data[8], int direction)
+void set_data_pins(uint8_t data[8], int direction)
 {
     for (int i = 0; i < 8; ++i) {
         pinMode(data[i], direction);
     }
 }
 
-uint16_t get_val_from_pins(int addr_pins[], int len)
+uint16_t get_val_from_pins(uint8_t addr_pins[], int len)
 {
     int addr = 0;
     for (int i = 0; i < len; ++i) {
@@ -226,7 +226,7 @@ void get_pins_state(uint8_t buff[BUFFSIZE])
     }
 }
 
-pins_t setup_pins(int pin_ids[])
+pins_t setup_pins(uint8_t pin_ids[])
 {
     set_pin_ids(pin_ids);
     auto p = pin_ids;
@@ -251,9 +251,9 @@ pins_t setup_pins(int pin_ids[])
     return pins;
 }
 
-void set_pin_ids(int ids[40])
+void set_pin_ids(uint8_t ids[40])
 {
-    int x[40] = { PINS_MAP };
+    uint8_t x[40] = { PINS_MAP };
     for (int i = 0; i < 40; i += 2) {
         ids[i / 2] = x[i];
         ids[39 - i / 2] = x[i + 1];

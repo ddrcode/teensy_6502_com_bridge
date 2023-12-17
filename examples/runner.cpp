@@ -14,15 +14,19 @@ Runner::Runner(int device, Memory *mem)
     this->cycle = 0;
 }
 
+void Runner::reset() {
+    // set_data();
+}
+
 bool Runner::step()
 {
     this->read_serial();
-    auto addr = decode_addr(this->buff);
-    if (this->is_write()) {
-        this->mem->write_byte(addr, decode_data(this->buff));
-    } else {
-        set_data(this->buff, this->mem->read_byte(addr));
-    }
+    // auto addr = decode_addr(this->buff);
+    // if (this->is_write()) {
+    //     this->mem->write_byte(addr, decode_data(this->buff));
+    // } else {
+    //     set_data(this->buff, this->mem->read_byte(addr));
+    // }
 
     this->print_state();
     this->advance_cycles();
@@ -32,6 +36,8 @@ bool Runner::step()
 
 void Runner::run()
 {
+    this->reset();
+
     uint8_t b[] = {
         0b11111110,
         0b00000010,
@@ -42,30 +48,36 @@ void Runner::run()
 
     cout << (uint16_t)pin(b, 9) << endl;
 
-    while (this->step());
+    while (this->step()) {
+        usleep(250000);
+    }
 }
 
 void Runner::print_state()
 {
     cout << "[Cycle " << dec << this->cycle
-         << "] Pins: " << pins_to_string(this->buff)
-         << ", Addr: " << hex << decode_addr(this->buff)
-         << ", Addr: " << addr_to_binary_str(decode_addr(this->buff))
-         << ", Data: " << hex << (uint16_t)decode_data(this->buff)
-         << ", Flags: " << (this->is_write() ? "W" : "R")
+         // << "] Pins: " << pins_to_string(this->buff)
+         << ", Addr:" << hex << this->pins.addr
+         << " (" << addr_to_binary_str(this->pins.addr)
+         << "), Data: " << hex << (uint16_t)this->pins.data
+         << ", R/W: " << (this->pins.rw ? "R" : "W")
          << endl;
 }
 
 void Runner::read_serial()
 {
+    uint8_t buff[5];
     for (int n=0; !n;) {
-        n = read(this->device, this->buff, BUFFSIZE);
+        n = read(this->device, buff, BUFFSIZE);
     }
+    this->pins.set_pins(buff);
 }
 
 void Runner::write_serial()
 {
-    auto _ = write(this->device, this->buff, BUFFSIZE);
+    uint8_t buff[5];
+    this->pins.set_buff(buff);
+    auto _ = write(this->device, buff, BUFFSIZE);
 }
 
 void Runner::advance_cycles()
@@ -76,8 +88,3 @@ void Runner::advance_cycles()
     this->phase = !this->phase;
 }
 
-inline bool Runner::is_write()
-{
-    // write is active when signal is low
-    return pin(this->buff, 33) == 0;
-}

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "memory.hpp"
+#include "pins.hpp"
 
 #define BUFFSIZE 5
 
@@ -11,7 +12,7 @@ private:
     bool phase;
     int device;
     uint64_t cycle;
-    uint8_t buff[BUFFSIZE];
+    W65C02Pins pins;
 
     void read_serial();
     void write_serial();
@@ -19,9 +20,8 @@ private:
 
 public:
     Runner(int device, Memory *mem);
+    void reset();
     bool step();
     void run();
     void print_state();
-
-    bool is_write();
 };

@@ -26,8 +26,9 @@ uint8_t decode_data(uint8_t pins[])
 
 void set_data(uint8_t pins[], uint8_t data)
 {
+    int pin_id = 32;
     for (int i = 0; i < 8; ++i) {
-        set_pin(pins, i, data & (1 << i));
+        set_pin(pins, pin_id--, data & (1 << i));
     }
 }
 
