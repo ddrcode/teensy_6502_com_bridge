@@ -1,11 +1,19 @@
 #include <iostream>
+#include <iomanip>
 #include <unistd.h>
 
 #include "pins.hpp"
 #include "runner.hpp"
 #include "pin_utils.hpp"
+#include "configuration.hpp"
 
-using namespace std;
+using std::cout;
+using std::hex;
+using std::dec;
+using std::endl;
+using std::right;
+using std::setw;
+using std::setfill;
 
 Runner::Runner(int device, Memory *mem)
 {
@@ -34,11 +42,8 @@ void Runner::reset()
         this->pins.set_overflow = true;
         this->pins.phi2 = this->phase;
         this->write_serial();
-        usleep(100000);
-        this->advance_cycles();
-
+        usleep(CYCLE_DURATION);
         this->read_serial();
-        usleep(100000);
         this->advance_cycles();
     }
 
@@ -56,8 +61,7 @@ bool Runner::step()
 
     this->pins.phi2 = this->phase;
     this->write_serial();
-    usleep(50000);
-    // this->advance_cycles();
+    usleep(CYCLE_DURATION);
 
     this->read_serial();
     if (!this->phase) {
@@ -67,33 +71,32 @@ bool Runner::step()
             this->pins.data = this->mem->read_byte(addr);
         }
     } else {
+        uint8_t data = this->pins.data;
         if (write) {
-            this->mem->write_byte(addr, this->pins.data);
-        } else {
-            // this->pins.data = this->mem->read_byte(addr);
+            this->mem->write_byte(addr, data);
         }
         this->print_state();
+        if (EXIT_ON_BRK && data == 0 && this->pins.sync) {
+            return false;
+        }
     }
-    usleep(50000);
-    this->advance_cycles();
 
-    return this->cycle < 500;
+    this->advance_cycles();
+    return MAX_CYCLES == 0 || this->cycle < MAX_CYCLES;
 }
 
 void Runner::run()
 {
     this->reset();
-    while (this->step()) {
-    }
+    while (this->step());
 }
 
 void Runner::print_state()
 {
-    cout << "[Cycle " << dec << this->cycle
-         // << "] Pins: " << pins_to_string(this->buff)
-         << ", Addr:" << hex << this->pins.addr
+    cout << "Cycle " << setfill(' ') << setw(5) << right << dec << this->cycle
+         << ", Addr: " << setfill('0') << setw(4) << right << hex << this->pins.addr
          << " (" << addr_to_binary_str(this->pins.addr)
-         << "), Data: " << hex << (uint16_t)this->pins.data
+         << "), Data: " << setfill('0') << setw(2) << right << hex << (uint16_t)this->pins.data
          << ", R/W: " << (this->pins.rw ? "R" : "W")
          << ", VP: " << (int)this->pins.vector_pull
          << ", SYNC " << (int)this->pins.sync

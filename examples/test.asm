@@ -10,9 +10,14 @@
 ;;                  y=$da21
 ;; so the result is z=$e020
 ;;
-;; At the end of the program compares the addition with expected values.
-;; Registry Y should be 0 in case of correct result and 0 otherwise.
-;; Registry A should contain hi-byte of the result and X: the low-byte.
+;; At the end, of the program compares the addition with expected values.
+;; Registry Y should be 0 in case of correct result and 1 otherwise.
+;; Registry A should contain hi-byte of the result and X - the low-byte.
+;;
+;; Additionally the program contains IRQ/NMI handling routine
+;; (that does nothing), but the code should never be called in
+;; properly configured bridge. If you'd see it being executed then
+;; most likely your NMI or IRQ pins aren't connected.
 ;;
 ;; Assembler: ACME
 ;; Assembling command: acme -f plain -o test.p --cpu w65c02 test.asm
@@ -54,8 +59,11 @@
         BNE end
         LDY #0
 
+        ; end the program
+        BRK
+
 end
-        NOP
+        ; or enter an infinite loop
         NOP
         JMP end
 
