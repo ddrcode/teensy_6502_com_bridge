@@ -226,11 +226,11 @@ uint16_t get_val_from_pins(uint8_t addr_pins[], int len)
 void get_pins_state(uint8_t buff[BUFFSIZE])
 {
     for(int i=0; i<BUFFSIZE; ++i) {
-        buff[i] = 0;
+        buff[BUFFSIZE - i - 1] = 0;
         for(int j=0; j < 8; ++j) {
             auto id = pin_ids[i*8 + j];
             if (id > 0) {
-                buff[i] |= digitalRead(id) == HIGH ? 1 << j : 0;
+                buff[BUFFSIZE - i - 1] |= digitalRead(id) == HIGH ? 1 << j : 0;
             }
         }
     }
@@ -256,7 +256,7 @@ void set_pins_state(const uint8_t buff[BUFFSIZE])
 
 void write_pin(const uint8_t buff[BUFFSIZE], uint8_t pin_id)
 {
-    bool val = buff[pin_id / 8] & (1 << (pin_id % 8));
+    bool val = buff[(39-pin_id) / 8] & (1 << (pin_id % 8));
     digitalWrite(pin_ids[pin_id], val ? HIGH : LOW);
 }
 
